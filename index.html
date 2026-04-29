@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SVA Advanced Analytics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --sva-primary: #0f766e;
+      --sva-accent: #0d9488;
+      --sva-bg: #f1f5f9;
+      --sva-card: #ffffff;
+      --sva-border: #cbd5e1;
+      --sva-text: #334155;
+      --sva-light: #f0fdfa;
+    }
+    
+    body { font-family: 'Inter', sans-serif; background-color: var(--sva-bg); color: var(--sva-text); margin: 0; padding-bottom: 50px; }
+    
+    .header { background-color: var(--sva-primary); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+    
+    .dashboard-container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+    
+    /* Filters */
+    .controls { background: var(--sva-card); padding: 20px 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 20px; margin-bottom: 30px; border: 1px solid var(--sva-border); }
+    .control-group { flex: 1; }
+    .control-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
+    select { width: 100%; padding: 12px; border: 1px solid var(--sva-border); border-radius: 6px; font-size: 15px; background: #fff; outline: none; cursor: pointer; transition: border 0.2s;}
+    select:focus { border-color: var(--sva-accent); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1); }
+
+    /* Top KPIs */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+    .kpi-card { background: var(--sva-card); padding: 25px; border-radius: 12px; border: 1px solid var(--sva-border); border-left: 5px solid var(--sva-accent); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .kpi-title { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+    .kpi-value { font-size: 36px; font-weight: 800; color: var(--sva-primary); }
+    .kpi-subtext { font-size: 13px; color: #94a3b8; margin-top: 5px; }
+
+    /* Main Grid */
+    .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+    
+    .card { background: var(--sva-card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--sva-border); }
+    .card h2 { margin-top: 0; color: var(--sva-primary); font-size: 18px; border-bottom: 2px solid var(--sva-bg); padding-bottom: 12px; margin-bottom: 20px;}
+    
+    .chart-container { position: relative; height: 320px; width: 100%; }
+
+    /* Data Table */
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    .data-table th, .data-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--sva-border); }
+    .data-table th { background-color: var(--sva-bg); color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+    .data-table tr:hover { background-color: #f8fafc; }
+
+    /* Feedback */
+    .feedback-section { margin-top: 20px; height: 500px; overflow-y: auto; padding-right: 10px; }
+    .feedback-item { background: #fff; border: 1px solid var(--sva-border); padding: 20px; border-radius: 8px; margin-bottom: 15px; font-size: 15px; line-height: 1.6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .feedback-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed var(--sva-border); padding-bottom: 10px;}
+    .feedback-badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+    .badge-strength { background: #dcfce7; color: #166534; }
+    .badge-enhance { background: #fef3c7; color: #92400e; }
+    .badge-classroom { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600;}
+
+    .loader { text-align: center; padding: 50px; font-size: 18px; color: #64748b; font-weight: 500; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SVA Analytics: Educator Excellence</h1>
+  <div id="status-badge" style="font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);">Authenticating...</div>
+</div>
+
+<div class="dashboard-container" id="loading-state">
+  <div class="loader">Securely fetching and encrypting survey data...</div>
+</div>
+
+<div class="dashboard-container hidden" id="dashboard-ui">
+  
+  <div class="controls">
+    <div class="control-group">
+      <label>1. Select Educator</label>
+      <select id="filter-teacher" onchange="updateClassroomDropdown()"></select>
+    </div>
+    <div class="control-group">
+      <label>2. Filter by Classroom (Optional)</label>
+      <select id="filter-class" onchange="renderDashboard()"></select>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-title">Overall Average Score</div>
+      <div class="kpi-value" id="avg-score">0.00</div>
+      <div class="kpi-subtext">Out of 4.0 Max Score</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Approval Rate</div>
+      <div class="kpi-value" id="approval-rate">0%</div>
+      <div class="kpi-subtext">% of "Agree" or "Strongly Agree" Ratings</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Total Reviews</div>
+      <div class="kpi-value" id="total-reviews">0</div>
+      <div class="kpi-subtext">Submitted across selected parameters</div>
+    </div>
+  </div>
+
+  <div class="grid-layout">
+    <div class="card">
+      <h2>Criteria Performance Profile</h2>
+      <div class="chart-container">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Sentiment Distribution</h2>
+      <div class="chart-container">
+        <canvas id="distChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-layout">
+    <div class="card" id="breakdown-card">
+      <h2>Classroom Analytics Breakdown</h2>
+      <p style="font-size: 13px; color: #64748b; margin-top: -10px;">Compare this educator's performance across the different classes they teach.</p>
+      <div style="overflow-x: auto;">
+        <table class="data-table" id="classroom-table">
+          <thead>
+            <tr>
+              <th>Classroom</th>
+              <th>Reviews</th>
+              <th>Avg Score</th>
+              <th>Approval Rate</th>
+            </tr>
+          </thead>
+          <tbody id="classroom-table-body">
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="grid-column: span 1;">
+      <h2>Qualitative Insights</h2>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button onclick="toggleFeedback('strengths')" id="btn-strengths" style="flex:1; background:var(--sva-primary); color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600;">Greatest Strengths</button>
+        <button onclick="toggleFeedback('enhance')" id="btn-enhance" style="flex:1; background:#e2e8f0; color:#475569; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600;">Opportunities to Enhance</button>
+      </div>
+      
+      <div id="feedback-strengths" class="feedback-section"></div>
+      <div id="feedback-enhance" class="feedback-section hidden"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // --- IMPORTANT: PASTE YOUR APP SCRIPT URL HERE ---
+  const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx5diOQnC1DlhQvat6pnpfCYEefCnIYRCJ08bySQKmH3BdYGRkmOyb6HZQSv7AdXnAd/exec";
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const SESSION_TOKEN = urlParams.get('token');
+  
+  let rawData = [];
+  let radarChartInstance = null;
+  let distChartInstance = null;
+
+  const scoreMap = { "Strongly Agree": 4, "Agree": 3, "Disagree": 2, "Strongly Disagree": 1 };
+
+  if (!SESSION_TOKEN) {
+    document.getElementById('loading-state').innerHTML = '<div class="loader" style="color: #b91c1c;">Unauthorized Access. Token required.</div>';
+    document.getElementById('status-badge').innerText = "Access Denied";
+    document.getElementById('status-badge').style.background = "#fee2e2";
+    document.getElementById('status-badge').style.color = "#b91c1c";
+  } else {
+    fetch(`${GAS_API_URL}?action=getResults&token=${SESSION_TOKEN}`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          rawData = res.data;
+          document.getElementById('status-badge').innerText = "Live Data Connected";
+          initializeEducatorFilter();
+        } else {
+          document.getElementById('loading-state').innerHTML = `<div class="loader" style="color: #b91c1c;">Error: ${res.error}</div>`;
+        }
+      });
+  }
+
+  function initializeEducatorFilter() {
+    const teacherSelect = document.getElementById('filter-teacher');
+    const uniqueTeachers = [...new Set(rawData.map(item => item.teacher))].filter(Boolean).sort();
+    
+    teacherSelect.innerHTML = '<option value="ALL">School-Wide Aggregate (All Educators)</option>';
+    uniqueTeachers.forEach(teacher => {
+      teacherSelect.innerHTML += `<option value="${teacher}">${teacher}</option>`;
+    });
+
+    updateClassroomDropdown();
+    
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('dashboard-ui').classList.remove('hidden');
+  }
+
+  function updateClassroomDropdown() {
+    const selectedTeacher = document.getElementById('filter-teacher').value;
+    const classSelect = document.getElementById('filter-class');
+    
+    let filteredData = rawData;
+    if (selectedTeacher !== "ALL") {
+      filteredData = rawData.filter(item => item.teacher === selectedTeacher);
+    }
+    
+    const uniqueClasses = [...new Set(filteredData.map(item => item.classroom))].filter(Boolean).sort();
+    
+    classSelect.innerHTML = '<option value="ALL">All Associated Classrooms</option>';
+    uniqueClasses.forEach(cls => {
+      classSelect.innerHTML += `<option value="${cls}">${cls}</option>`;
+    });
+
+    renderDashboard();
+  }
+
+  function renderDashboard() {
+    const selectedTeacher = document.getElementById('filter-teacher').value;
+    const selectedClass = document.getElementById('filter-class').value;
+    
+    let activeData = rawData;
+    if (selectedTeacher !== "ALL") activeData = activeData.filter(i => i.teacher === selectedTeacher);
+    if (selectedClass !== "ALL") activeData = activeData.filter(i => i.classroom === selectedClass);
+
+    document.getElementById('total-reviews').innerText = activeData.length;
+
+    // Advanced Metrics Calculation
+    let scores = { q1: [], q2: [], q3: [], q4: [], q5: [] };
+    let distribution = { 4: 0, 3: 0, 2: 0, 1: 0 };
+    let totalValidAnswers = 0;
+    
+    activeData.forEach(row => {
+      ['q1', 'q2', 'q3', 'q4', 'q5'].forEach(q => {
+        let val = scoreMap[row[q]];
+        if (val) {
+          scores[q].push(val);
+          distribution[val]++;
+          totalValidAnswers++;
+        }
+      });
+    });
+
+    const getAvg = (arr) => arr.length ? (arr.reduce((a,b) => a+b, 0) / arr.length).toFixed(2) : 0;
+    const avgData = [getAvg(scores.q1), getAvg(scores.q2), getAvg(scores.q3), getAvg(scores.q4), getAvg(scores.q5)];
+
+    const validAvgs = avgData.filter(v => v > 0);
+    const overallAvg = validAvgs.length ? (validAvgs.reduce((a,b) => parseFloat(a)+parseFloat(b), 0) / validAvgs.length).toFixed(2) : "0.00";
+    document.getElementById('avg-score').innerText = overallAvg;
+
+    // Approval Rate (% of 3s and 4s)
+    let approvalRate = 0;
+    if (totalValidAnswers > 0) {
+      approvalRate = (((distribution[4] + distribution[3]) / totalValidAnswers) * 100).toFixed(1);
+    }
+    document.getElementById('approval-rate').innerText = `${approvalRate}%`;
+
+    renderRadarChart(avgData);
+    renderDistChart(distribution);
+    renderTextFeedback(activeData);
+    
+    // Handle Classroom Table
+    if (selectedTeacher !== "ALL" && selectedClass === "ALL") {
+       document.getElementById('breakdown-card').style.display = 'block';
+       renderClassroomTable(activeData);
+    } else {
+       document.getElementById('breakdown-card').style.display = 'none';
+    }
+  }
+
+  function renderClassroomTable(teacherData) {
+    const tbody = document.getElementById('classroom-table-body');
+    tbody.innerHTML = '';
+
+    const classStats = {};
+    teacherData.forEach(row => {
+      if (!classStats[row.classroom]) {
+        classStats[row.classroom] = { count: 0, sum: 0, totalAns: 0, positiveAns: 0 };
+      }
+      
+      let reviewSum = 0;
+      let validQuestions = 0;
+
+      ['q1', 'q2', 'q3', 'q4', 'q5'].forEach(q => {
+        let val = scoreMap[row[q]];
+        if (val) {
+          reviewSum += val;
+          validQuestions++;
+          classStats[row.classroom].totalAns++;
+          if (val >= 3) classStats[row.classroom].positiveAns++;
+        }
+      });
+
+      if (validQuestions > 0) {
+        classStats[row.classroom].count++;
+        classStats[row.classroom].sum += (reviewSum / validQuestions);
+      }
+    });
+
+    Object.keys(classStats).sort().forEach(cls => {
+      const stats = classStats[cls];
+      const avg = (stats.sum / stats.count).toFixed(2);
+      const appRate = stats.totalAns > 0 ? ((stats.positiveAns / stats.totalAns) * 100).toFixed(1) : 0;
+      
+      tbody.innerHTML += `
+        <tr>
+          <td style="font-weight: 600; color: var(--sva-primary);">${cls}</td>
+          <td>${stats.count}</td>
+          <td><span style="background: ${avg >= 3.5 ? '#dcfce7' : (avg >= 2.5 ? '#fef08a' : '#fee2e2')}; padding: 3px 8px; border-radius: 4px; font-weight:600;">${avg}</span></td>
+          <td>${appRate}%</td>
+        </tr>
+      `;
+    });
+  }
+
+  function renderRadarChart(dataArr) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    if (radarChartInstance) radarChartInstance.destroy();
+    
+    radarChartInstance = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Academic Growth', 'Social/Emotional', 'Student Connection', 'Communication', 'Partnership'],
+        datasets: [{
+          label: 'Score Profile',
+          data: dataArr,
+          backgroundColor: 'rgba(13, 148, 136, 0.2)',
+          borderColor: 'rgba(15, 118, 110, 1)',
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: 'rgba(15, 118, 110, 1)',
+          borderWidth: 2,
+          pointRadius: 4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 4, ticks: { stepSize: 1, backdropColor: 'transparent' } } }, plugins: { legend: { display: false } } }
+    });
+  }
+
+  function renderDistChart(dist) {
+    const ctx = document.getElementById('distChart').getContext('2d');
+    if (distChartInstance) distChartInstance.destroy();
+    
+    distChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Strongly Agree (4)', 'Agree (3)', 'Disagree (2)', 'Strongly Disagree (1)'],
+        datasets: [{
+          data: [dist[4], dist[3], dist[2], dist[1]],
+          backgroundColor: ['#0f766e', '#2dd4bf', '#fb923c', '#ef4444'],
+          borderRadius: 4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+  }
+
+  function renderTextFeedback(activeData) {
+    const strengthsContainer = document.getElementById('feedback-strengths');
+    const enhanceContainer = document.getElementById('feedback-enhance');
+    
+    strengthsContainer.innerHTML = '';
+    enhanceContainer.innerHTML = '';
+
+    let hasStrengths = false;
+    let hasEnhance = false;
+
+    // Reverse to show newest first
+    [...activeData].reverse().forEach(row => {
+      const date = new Date(row.timestamp).toLocaleDateString();
+      const metaHtml = `
+        <div class="feedback-meta">
+          <span class="badge-classroom">${row.classroom}</span>
+          <span style="font-size: 11px; color: #94a3b8;">${date}</span>
+        </div>`;
+
+      if (row.strengths && row.strengths.trim() !== "") {
+        strengthsContainer.innerHTML += `
+          <div class="feedback-item">
+            ${metaHtml}
+            <span class="feedback-badge badge-strength">Strength</span><br>
+            <div style="margin-top: 8px; color: #334155;">"${row.strengths}"</div>
+          </div>`;
+        hasStrengths = true;
+      }
+      if (row.enhance && row.enhance.trim() !== "") {
+        enhanceContainer.innerHTML += `
+          <div class="feedback-item">
+            ${metaHtml}
+            <span class="feedback-badge badge-enhance">Opportunity</span><br>
+            <div style="margin-top: 8px; color: #334155;">"${row.enhance}"</div>
+          </div>`;
+        hasEnhance = true;
+      }
+    });
+
+    if (!hasStrengths) strengthsContainer.innerHTML = "<div style='text-align:center; padding: 30px; color:#94a3b8;'>No strength feedback submitted for current selection.</div>";
+    if (!hasEnhance) enhanceContainer.innerHTML = "<div style='text-align:center; padding: 30px; color:#94a3b8;'>No opportunity feedback submitted for current selection.</div>";
+  }
+
+  function toggleFeedback(type) {
+    const btnS = document.getElementById('btn-strengths');
+    const btnE = document.getElementById('btn-enhance');
+    
+    if (type === 'strengths') {
+      document.getElementById('feedback-strengths').classList.remove('hidden');
+      document.getElementById('feedback-enhance').classList.add('hidden');
+      btnS.style.background = 'var(--sva-primary)'; btnS.style.color = 'white';
+      btnE.style.background = '#e2e8f0'; btnE.style.color = '#475569';
+    } else {
+      document.getElementById('feedback-strengths').classList.add('hidden');
+      document.getElementById('feedback-enhance').classList.remove('hidden');
+      btnE.style.background = 'var(--sva-primary)'; btnE.style.color = 'white';
+      btnS.style.background = '#e2e8f0'; btnS.style.color = '#475569';
+    }
+  }
+</script>
+</body>
+</html>
