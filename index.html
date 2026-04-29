@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>SVA Advanced Analytics</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,147 +14,124 @@
       --sva-card: #ffffff;
       --sva-border: #cbd5e1;
       --sva-text: #334155;
-      --sva-light: #f0fdfa;
     }
     
     body { font-family: 'Inter', sans-serif; background-color: var(--sva-bg); color: var(--sva-text); margin: 0; padding-bottom: 50px; }
     
-    .header { background-color: var(--sva-primary); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+    .header { background-color: var(--sva-primary); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header h1 { margin: 0; font-size: 22px; font-weight: 600; }
     
     .dashboard-container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
     
-    /* Filters */
-    .controls { background: var(--sva-card); padding: 20px 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 20px; margin-bottom: 30px; border: 1px solid var(--sva-border); }
-    .control-group { flex: 1; }
-    .control-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
-    select { width: 100%; padding: 12px; border: 1px solid var(--sva-border); border-radius: 6px; font-size: 15px; background: #fff; outline: none; cursor: pointer; transition: border 0.2s;}
-    select:focus { border-color: var(--sva-accent); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1); }
-
-    /* Top KPIs */
-    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-    .kpi-card { background: var(--sva-card); padding: 25px; border-radius: 12px; border: 1px solid var(--sva-border); border-left: 5px solid var(--sva-accent); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .kpi-title { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
-    .kpi-value { font-size: 36px; font-weight: 800; color: var(--sva-primary); }
-    .kpi-subtext { font-size: 13px; color: #94a3b8; margin-top: 5px; }
-
-    /* Main Grid */
-    .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-    
-    .card { background: var(--sva-card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--sva-border); }
+    .card { background: var(--sva-card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--sva-border); margin-bottom: 20px; }
     .card h2 { margin-top: 0; color: var(--sva-primary); font-size: 18px; border-bottom: 2px solid var(--sva-bg); padding-bottom: 12px; margin-bottom: 20px;}
     
+    /* Responsive Grid Layouts */
+    .controls { display: flex; gap: 20px; }
+    .control-group { flex: 1; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+    .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+    
+    .kpi-card { background: var(--sva-card); padding: 25px; border-radius: 12px; border: 1px solid var(--sva-border); border-left: 5px solid var(--sva-accent); }
+    .kpi-title { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+    .kpi-value { font-size: 36px; font-weight: 800; color: var(--sva-primary); }
+
     .chart-container { position: relative; height: 320px; width: 100%; }
-
-    /* Data Table */
-    .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .data-table th, .data-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--sva-border); }
-    .data-table th { background-color: var(--sva-bg); color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; }
-    .data-table tr:hover { background-color: #f8fafc; }
+    
+    select, input, button { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--sva-border); border-radius: 6px; font-size: 16px; outline: none; font-family: 'Inter', sans-serif;}
+    button { background-color: var(--sva-primary); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; border: none; margin-top: 15px;}
+    button:hover { background-color: #0b5e58; }
 
-    /* Feedback */
-    .feedback-section { margin-top: 20px; height: 500px; overflow-y: auto; padding-right: 10px; }
-    .feedback-item { background: #fff; border: 1px solid var(--sva-border); padding: 20px; border-radius: 8px; margin-bottom: 15px; font-size: 15px; line-height: 1.6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .feedback-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed var(--sva-border); padding-bottom: 10px;}
-    .feedback-badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-    .badge-strength { background: #dcfce7; color: #166534; }
-    .badge-enhance { background: #fef3c7; color: #92400e; }
-    .badge-classroom { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600;}
+    .feedback-section { margin-top: 20px; max-height: 500px; overflow-y: auto; padding-right: 10px; }
+    .feedback-item { background: #fff; border: 1px solid var(--sva-border); padding: 20px; border-radius: 8px; margin-bottom: 15px; font-size: 15px; }
 
-    .loader { text-align: center; padding: 50px; font-size: 18px; color: #64748b; font-weight: 500; }
     .hidden { display: none !important; }
+    .loader { text-align: center; padding: 50px; color: #64748b; font-weight: 500; }
+
+    /* MOBILE RESPONSIVENESS */
+    @media (max-width: 768px) {
+      .header { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
+      .controls { flex-direction: column; gap: 15px; }
+      .kpi-grid { grid-template-columns: 1fr; gap: 15px; }
+      .grid-layout { grid-template-columns: 1fr; gap: 20px; }
+      .dashboard-container { margin: 15px auto; }
+      .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>SVA Analytics: Educator Excellence</h1>
-  <div id="status-badge" style="font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);">Authenticating...</div>
+  <h1>SVA Analytics Dashboard</h1>
+  <div id="status-badge" style="font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px;">Locked</div>
 </div>
 
-<div class="dashboard-container" id="loading-state">
-  <div class="loader">Securely fetching and encrypting survey data...</div>
+<div class="dashboard-container" id="auth-screen" style="max-width: 450px; margin-top: 60px;">
+  <div class="card" style="text-align: center; padding: 40px 30px;">
+    <div style="font-size: 40px; margin-bottom: 10px;">🔒</div>
+    <h2>Admin Authentication</h2>
+    <p style="color: #64748b; font-size: 14px; margin-bottom: 25px;">Please enter your secure access code.</p>
+    <input type="password" id="pin-input" placeholder="Enter Code" style="text-align: center; font-size: 24px; letter-spacing: 4px; font-weight: bold;">
+    <button onclick="authenticateAndFetch()">Unlock Dashboard</button>
+    <div id="auth-error" style="color: #ef4444; margin-top: 15px; font-size: 14px; display: none; font-weight: 500;"></div>
+  </div>
+</div>
+
+<div class="dashboard-container hidden" id="loading-state">
+  <div class="loader">Decrypting and loading analytics...</div>
 </div>
 
 <div class="dashboard-container hidden" id="dashboard-ui">
-  
-  <div class="controls">
+  <div class="card controls">
     <div class="control-group">
-      <label>1. Select Educator</label>
+      <label style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase;">Educator</label>
       <select id="filter-teacher" onchange="updateClassroomDropdown()"></select>
     </div>
     <div class="control-group">
-      <label>2. Filter by Classroom (Optional)</label>
+      <label style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase;">Classroom</label>
       <select id="filter-class" onchange="renderDashboard()"></select>
     </div>
   </div>
 
   <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-title">Overall Average Score</div>
-      <div class="kpi-value" id="avg-score">0.00</div>
-      <div class="kpi-subtext">Out of 4.0 Max Score</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Approval Rate</div>
-      <div class="kpi-value" id="approval-rate">0%</div>
-      <div class="kpi-subtext">% of "Agree" or "Strongly Agree" Ratings</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Total Reviews</div>
-      <div class="kpi-value" id="total-reviews">0</div>
-      <div class="kpi-subtext">Submitted across selected parameters</div>
-    </div>
+    <div class="kpi-card"><div class="kpi-title">Average Score</div><div class="kpi-value" id="avg-score">0.00</div></div>
+    <div class="kpi-card"><div class="kpi-title">Approval Rate</div><div class="kpi-value" id="approval-rate">0%</div></div>
+    <div class="kpi-card"><div class="kpi-title">Total Reviews</div><div class="kpi-value" id="total-reviews">0</div></div>
   </div>
 
   <div class="grid-layout">
     <div class="card">
-      <h2>Criteria Performance Profile</h2>
-      <div class="chart-container">
-        <canvas id="radarChart"></canvas>
-      </div>
+      <h2>Criteria Performance</h2>
+      <div class="chart-container"><canvas id="radarChart"></canvas></div>
     </div>
-
     <div class="card">
       <h2>Sentiment Distribution</h2>
-      <div class="chart-container">
-        <canvas id="distChart"></canvas>
-      </div>
+      <div class="chart-container"><canvas id="distChart"></canvas></div>
     </div>
   </div>
 
   <div class="grid-layout">
     <div class="card" id="breakdown-card">
-      <h2>Classroom Analytics Breakdown</h2>
-      <p style="font-size: 13px; color: #64748b; margin-top: -10px;">Compare this educator's performance across the different classes they teach.</p>
+      <h2>Classroom Breakdown</h2>
       <div style="overflow-x: auto;">
-        <table class="data-table" id="classroom-table">
-          <thead>
-            <tr>
-              <th>Classroom</th>
-              <th>Reviews</th>
-              <th>Avg Score</th>
-              <th>Approval Rate</th>
-            </tr>
-          </thead>
-          <tbody id="classroom-table-body">
-            </tbody>
+        <table class="data-table">
+          <thead><tr><th>Classroom</th><th>Reviews</th><th>Score</th><th>Approval</th></tr></thead>
+          <tbody id="classroom-table-body"></tbody>
         </table>
       </div>
     </div>
-
-    <div class="card" style="grid-column: span 1;">
+    <div class="card">
       <h2>Qualitative Insights</h2>
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button onclick="toggleFeedback('strengths')" id="btn-strengths" style="flex:1; background:var(--sva-primary); color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600;">Greatest Strengths</button>
-        <button onclick="toggleFeedback('enhance')" id="btn-enhance" style="flex:1; background:#e2e8f0; color:#475569; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600;">Opportunities to Enhance</button>
+        <button onclick="toggleFeedback('strengths')" id="btn-strengths" style="margin-top:0; flex:1;">Strengths</button>
+        <button onclick="toggleFeedback('enhance')" id="btn-enhance" style="margin-top:0; flex:1; background:#e2e8f0; color:#475569;">Opportunities</button>
       </div>
-      
       <div id="feedback-strengths" class="feedback-section"></div>
       <div id="feedback-enhance" class="feedback-section hidden"></div>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -167,25 +144,59 @@
   let rawData = [];
   let radarChartInstance = null;
   let distChartInstance = null;
-
   const scoreMap = { "Strongly Agree": 4, "Agree": 3, "Disagree": 2, "Strongly Disagree": 1 };
 
-  if (!SESSION_TOKEN) {
-    document.getElementById('loading-state').innerHTML = '<div class="loader" style="color: #b91c1c;">Unauthorized Access. Token required.</div>';
-    document.getElementById('status-badge').innerText = "Access Denied";
-    document.getElementById('status-badge').style.background = "#fee2e2";
-    document.getElementById('status-badge').style.color = "#b91c1c";
-  } else {
-    fetch(`${GAS_API_URL}?action=getResults&token=${SESSION_TOKEN}`)
+  // Allow pressing "Enter" on mobile keyboards to submit PIN
+  document.getElementById("pin-input").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      authenticateAndFetch();
+    }
+  });
+
+  function authenticateAndFetch() {
+    const pin = document.getElementById('pin-input').value;
+    const errorDiv = document.getElementById('auth-error');
+    
+    if (!SESSION_TOKEN) {
+      errorDiv.innerText = "Error: Missing secure URL token.";
+      errorDiv.style.display = 'block';
+      return;
+    }
+
+    if (!pin) {
+      errorDiv.innerText = "Please enter a code.";
+      errorDiv.style.display = 'block';
+      return;
+    }
+
+    // Switch UI to loading state
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('loading-state').classList.remove('hidden');
+    errorDiv.style.display = 'none';
+
+    // Fetch data with BOTH token and pin
+    fetch(`${GAS_API_URL}?action=getResults&token=${SESSION_TOKEN}&pin=${pin}`)
       .then(res => res.json())
       .then(res => {
         if (res.success) {
           rawData = res.data;
           document.getElementById('status-badge').innerText = "Live Data Connected";
+          document.getElementById('status-badge').style.background = "rgba(16, 185, 129, 0.2)"; // Green tint
           initializeEducatorFilter();
         } else {
-          document.getElementById('loading-state').innerHTML = `<div class="loader" style="color: #b91c1c;">Error: ${res.error}</div>`;
+          // Authentication Failed
+          document.getElementById('loading-state').classList.add('hidden');
+          document.getElementById('auth-screen').classList.remove('hidden');
+          errorDiv.innerText = res.error;
+          errorDiv.style.display = 'block';
         }
+      })
+      .catch(err => {
+          document.getElementById('loading-state').classList.add('hidden');
+          document.getElementById('auth-screen').classList.remove('hidden');
+          errorDiv.innerText = "Network Error. Please try again.";
+          errorDiv.style.display = 'block';
       });
   }
 
@@ -193,13 +204,12 @@
     const teacherSelect = document.getElementById('filter-teacher');
     const uniqueTeachers = [...new Set(rawData.map(item => item.teacher))].filter(Boolean).sort();
     
-    teacherSelect.innerHTML = '<option value="ALL">School-Wide Aggregate (All Educators)</option>';
+    teacherSelect.innerHTML = '<option value="ALL">School-Wide Aggregate</option>';
     uniqueTeachers.forEach(teacher => {
       teacherSelect.innerHTML += `<option value="${teacher}">${teacher}</option>`;
     });
 
     updateClassroomDropdown();
-    
     document.getElementById('loading-state').classList.add('hidden');
     document.getElementById('dashboard-ui').classList.remove('hidden');
   }
@@ -215,7 +225,7 @@
     
     const uniqueClasses = [...new Set(filteredData.map(item => item.classroom))].filter(Boolean).sort();
     
-    classSelect.innerHTML = '<option value="ALL">All Associated Classrooms</option>';
+    classSelect.innerHTML = '<option value="ALL">All Classrooms</option>';
     uniqueClasses.forEach(cls => {
       classSelect.innerHTML += `<option value="${cls}">${cls}</option>`;
     });
@@ -233,7 +243,6 @@
 
     document.getElementById('total-reviews').innerText = activeData.length;
 
-    // Advanced Metrics Calculation
     let scores = { q1: [], q2: [], q3: [], q4: [], q5: [] };
     let distribution = { 4: 0, 3: 0, 2: 0, 1: 0 };
     let totalValidAnswers = 0;
@@ -242,9 +251,7 @@
       ['q1', 'q2', 'q3', 'q4', 'q5'].forEach(q => {
         let val = scoreMap[row[q]];
         if (val) {
-          scores[q].push(val);
-          distribution[val]++;
-          totalValidAnswers++;
+          scores[q].push(val); distribution[val]++; totalValidAnswers++;
         }
       });
     });
@@ -256,18 +263,14 @@
     const overallAvg = validAvgs.length ? (validAvgs.reduce((a,b) => parseFloat(a)+parseFloat(b), 0) / validAvgs.length).toFixed(2) : "0.00";
     document.getElementById('avg-score').innerText = overallAvg;
 
-    // Approval Rate (% of 3s and 4s)
     let approvalRate = 0;
-    if (totalValidAnswers > 0) {
-      approvalRate = (((distribution[4] + distribution[3]) / totalValidAnswers) * 100).toFixed(1);
-    }
+    if (totalValidAnswers > 0) approvalRate = (((distribution[4] + distribution[3]) / totalValidAnswers) * 100).toFixed(1);
     document.getElementById('approval-rate').innerText = `${approvalRate}%`;
 
     renderRadarChart(avgData);
     renderDistChart(distribution);
     renderTextFeedback(activeData);
     
-    // Handle Classroom Table
     if (selectedTeacher !== "ALL" && selectedClass === "ALL") {
        document.getElementById('breakdown-card').style.display = 'block';
        renderClassroomTable(activeData);
@@ -279,67 +282,31 @@
   function renderClassroomTable(teacherData) {
     const tbody = document.getElementById('classroom-table-body');
     tbody.innerHTML = '';
-
     const classStats = {};
     teacherData.forEach(row => {
-      if (!classStats[row.classroom]) {
-        classStats[row.classroom] = { count: 0, sum: 0, totalAns: 0, positiveAns: 0 };
-      }
-      
-      let reviewSum = 0;
-      let validQuestions = 0;
-
+      if (!classStats[row.classroom]) classStats[row.classroom] = { count: 0, sum: 0, totalAns: 0, positiveAns: 0 };
+      let reviewSum = 0; let validQuestions = 0;
       ['q1', 'q2', 'q3', 'q4', 'q5'].forEach(q => {
         let val = scoreMap[row[q]];
-        if (val) {
-          reviewSum += val;
-          validQuestions++;
-          classStats[row.classroom].totalAns++;
-          if (val >= 3) classStats[row.classroom].positiveAns++;
-        }
+        if (val) { reviewSum += val; validQuestions++; classStats[row.classroom].totalAns++; if (val >= 3) classStats[row.classroom].positiveAns++; }
       });
-
-      if (validQuestions > 0) {
-        classStats[row.classroom].count++;
-        classStats[row.classroom].sum += (reviewSum / validQuestions);
-      }
+      if (validQuestions > 0) { classStats[row.classroom].count++; classStats[row.classroom].sum += (reviewSum / validQuestions); }
     });
 
     Object.keys(classStats).sort().forEach(cls => {
       const stats = classStats[cls];
       const avg = (stats.sum / stats.count).toFixed(2);
       const appRate = stats.totalAns > 0 ? ((stats.positiveAns / stats.totalAns) * 100).toFixed(1) : 0;
-      
-      tbody.innerHTML += `
-        <tr>
-          <td style="font-weight: 600; color: var(--sva-primary);">${cls}</td>
-          <td>${stats.count}</td>
-          <td><span style="background: ${avg >= 3.5 ? '#dcfce7' : (avg >= 2.5 ? '#fef08a' : '#fee2e2')}; padding: 3px 8px; border-radius: 4px; font-weight:600;">${avg}</span></td>
-          <td>${appRate}%</td>
-        </tr>
-      `;
+      tbody.innerHTML += `<tr><td style="font-weight: 600;">${cls}</td><td>${stats.count}</td><td><span style="background: ${avg >= 3.5 ? '#dcfce7' : (avg >= 2.5 ? '#fef08a' : '#fee2e2')}; padding: 2px 6px; border-radius: 4px;">${avg}</span></td><td>${appRate}%</td></tr>`;
     });
   }
 
   function renderRadarChart(dataArr) {
     const ctx = document.getElementById('radarChart').getContext('2d');
     if (radarChartInstance) radarChartInstance.destroy();
-    
     radarChartInstance = new Chart(ctx, {
       type: 'radar',
-      data: {
-        labels: ['Academic Growth', 'Social/Emotional', 'Student Connection', 'Communication', 'Partnership'],
-        datasets: [{
-          label: 'Score Profile',
-          data: dataArr,
-          backgroundColor: 'rgba(13, 148, 136, 0.2)',
-          borderColor: 'rgba(15, 118, 110, 1)',
-          pointBackgroundColor: '#ffffff',
-          pointBorderColor: 'rgba(15, 118, 110, 1)',
-          borderWidth: 2,
-          pointRadius: 4
-        }]
-      },
+      data: { labels: ['Academic', 'Social', 'Connection', 'Communication', 'Partnership'], datasets: [{ data: dataArr, backgroundColor: 'rgba(13, 148, 136, 0.2)', borderColor: '#0f766e', borderWidth: 2 }] },
       options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 4, ticks: { stepSize: 1, backdropColor: 'transparent' } } }, plugins: { legend: { display: false } } }
     });
   }
@@ -347,68 +314,30 @@
   function renderDistChart(dist) {
     const ctx = document.getElementById('distChart').getContext('2d');
     if (distChartInstance) distChartInstance.destroy();
-    
     distChartInstance = new Chart(ctx, {
       type: 'bar',
-      data: {
-        labels: ['Strongly Agree (4)', 'Agree (3)', 'Disagree (2)', 'Strongly Disagree (1)'],
-        datasets: [{
-          data: [dist[4], dist[3], dist[2], dist[1]],
-          backgroundColor: ['#0f766e', '#2dd4bf', '#fb923c', '#ef4444'],
-          borderRadius: 4
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+      data: { labels: ['Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree'], datasets: [{ data: [dist[4], dist[3], dist[2], dist[1]], backgroundColor: ['#0f766e', '#2dd4bf', '#fb923c', '#ef4444'], borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
   }
 
   function renderTextFeedback(activeData) {
     const strengthsContainer = document.getElementById('feedback-strengths');
     const enhanceContainer = document.getElementById('feedback-enhance');
-    
-    strengthsContainer.innerHTML = '';
-    enhanceContainer.innerHTML = '';
+    strengthsContainer.innerHTML = ''; enhanceContainer.innerHTML = '';
 
-    let hasStrengths = false;
-    let hasEnhance = false;
-
-    // Reverse to show newest first
     [...activeData].reverse().forEach(row => {
-      const date = new Date(row.timestamp).toLocaleDateString();
-      const metaHtml = `
-        <div class="feedback-meta">
-          <span class="badge-classroom">${row.classroom}</span>
-          <span style="font-size: 11px; color: #94a3b8;">${date}</span>
-        </div>`;
-
-      if (row.strengths && row.strengths.trim() !== "") {
-        strengthsContainer.innerHTML += `
-          <div class="feedback-item">
-            ${metaHtml}
-            <span class="feedback-badge badge-strength">Strength</span><br>
-            <div style="margin-top: 8px; color: #334155;">"${row.strengths}"</div>
-          </div>`;
-        hasStrengths = true;
-      }
-      if (row.enhance && row.enhance.trim() !== "") {
-        enhanceContainer.innerHTML += `
-          <div class="feedback-item">
-            ${metaHtml}
-            <span class="feedback-badge badge-enhance">Opportunity</span><br>
-            <div style="margin-top: 8px; color: #334155;">"${row.enhance}"</div>
-          </div>`;
-        hasEnhance = true;
-      }
+      const meta = `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;"><span style="background:#e0f2fe; color:#075985; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:600;">${row.classroom}</span><span style="font-size:11px; color:#94a3b8;">${new Date(row.timestamp).toLocaleDateString()}</span></div>`;
+      if (row.strengths && row.strengths.trim() !== "") strengthsContainer.innerHTML += `<div class="feedback-item">${meta}<div>"${row.strengths}"</div></div>`;
+      if (row.enhance && row.enhance.trim() !== "") enhanceContainer.innerHTML += `<div class="feedback-item">${meta}<div>"${row.enhance}"</div></div>`;
     });
-
-    if (!hasStrengths) strengthsContainer.innerHTML = "<div style='text-align:center; padding: 30px; color:#94a3b8;'>No strength feedback submitted for current selection.</div>";
-    if (!hasEnhance) enhanceContainer.innerHTML = "<div style='text-align:center; padding: 30px; color:#94a3b8;'>No opportunity feedback submitted for current selection.</div>";
+    if (!strengthsContainer.innerHTML) strengthsContainer.innerHTML = "<div style='text-align:center; padding: 20px; color:#94a3b8;'>No data.</div>";
+    if (!enhanceContainer.innerHTML) enhanceContainer.innerHTML = "<div style='text-align:center; padding: 20px; color:#94a3b8;'>No data.</div>";
   }
 
   function toggleFeedback(type) {
     const btnS = document.getElementById('btn-strengths');
     const btnE = document.getElementById('btn-enhance');
-    
     if (type === 'strengths') {
       document.getElementById('feedback-strengths').classList.remove('hidden');
       document.getElementById('feedback-enhance').classList.add('hidden');
